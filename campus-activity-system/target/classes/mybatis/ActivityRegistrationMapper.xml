@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.campusactivity.mapper.ActivityRegistrationMapper">
+
+    <!-- 结果映射 - 基础字段 -->
+    <resultMap id="BaseResultMap" type="com.campusactivity.entity.ActivityRegistration">
+        <id column="registration_id" property="registrationId"/>
+        <result column="user_id" property="userId"/>
+        <result column="activity_id" property="activityId"/>
+        <result column="registration_time" property="registrationTime"/>
+        <result column="status" property="status"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+
+    <!-- 结果映射 - 包含关联对象 -->
+    <resultMap id="DetailResultMap" type="com.campusactivity.entity.ActivityRegistration" extends="BaseResultMap">
+        <association property="user" javaType="com.campusactivity.entity.User">
+            <id column="user_id" property="userId"/>
+            <result column="username" property="username"/>
+            <result column="email" property="email"/>
+            <result column="avatar" property="avatar"/>
+        </association>
+        <association property="activity" javaType="com.campusactivity.entity.Activity">
+            <id column="activity_id" property="activityId"/>
+            <result column="title" property="title"/>
+            <result column="description" property="description"/>
+            <result column="start_time" property="startTime"/>
+            <result column="end_time" property="endTime"/>
+            <result column="location" property="location"/>
+            <result column="type" property="type"/>
+        </association>
+    </resultMap>
+
+    <!-- 插入报名记录 -->
+    <insert id="insert" parameterType="com.campusactivity.entity.ActivityRegistration" 
+            useGeneratedKeys="true" keyProperty="registrationId">
+        INSERT INTO activity_registration (user_id, activity_id, status, remark)
+        VALUES (#{userId}, #{activityId}, #{status}, #{remark})
+    </insert>
+
+    <!-- 根据ID删除报名记录 -->
+    <delete id="deleteById" parameterType="int">
+        DELETE FROM activity_registration WHERE registration_id = #{registrationId}
+    </delete>
+
+    <!-- 更新报名状态 -->
+    <update id="updateStatus">
+        UPDATE activity_registration 
+        SET status = #{status}
+        WHERE registration_id = #{registrationId}
+    </update>
+
+    <!-- 根据ID查询报名记录 -->
+    <select id="findById" parameterType="int" resultMap="DetailResultMap">
+        SELECT 
+            ar.registration_id, ar.user_id, ar.activity_id, ar.registration_time, ar.status, ar.remark,
+            u.username, u.email, u.avatar,
+            a.title, a.description, a.start_time, a.end_time, a.location, a.type
+        FROM activity_registration ar
+        LEFT JOIN user u ON ar.user_id = u.user_id
+        LEFT JOIN activity a ON ar.activity_id = a.activity_id
+        WHERE ar.registration_id = #{registrationId}
+    </select>
+
+    <!-- 查询用户是否已报名某活动 -->
+    <select id="findByUserAndActivity" resultMap="BaseResultMap">
+        SELECT registration_id, user_id, activity_id, registration_time, status, remark
+        FROM activity_registration
+        WHERE user_id = #{userId} AND activity_id = #{activityId}
+    </select>
+
+    <!-- 查询用户的所有报名记录 -->
+    <select id="findByUserId" parameterType="int" resultMap="DetailResultMap">
+        SELECT 
+            ar.registration_id, ar.user_id, ar.activity_id, ar.registration_time, ar.status, ar.remark,
+            u.username, u.email, u.avatar,
+            a.title, a.description, a.start_time, a.end_time, a.location, a.type
+        FROM activity_registration ar
+        LEFT JOIN user u ON ar.user_id = u.user_id
+        LEFT JOIN activity a ON ar.activity_id = a.activity_id
+        WHERE ar.user_id = #{userId}
+        ORDER BY ar.registration_time DESC
+    </select>
+
+    <!-- 查询某活动的所有报名记录 -->
+    <select id="findByActivityId" parameterType="int" resultMap="DetailResultMap">
+        SELECT 
+            ar.registration_id, ar.user_id, ar.activity_id, ar.registration_time, ar.status, ar.remark,
+            u.username, u.email, u.avatar,
+            a.title, a.description, a.start_time, a.end_time, a.location, a.type
+        FROM activity_registration ar
+        LEFT JOIN user u ON ar.user_id = u.user_id
+        LEFT JOIN activity a ON ar.activity_id = a.activity_id
+        WHERE ar.activity_id = #{activityId}
+        ORDER BY ar.registration_time DESC
+    </select>
+
+    <!-- 根据状态查询某活动的报名记录 -->
+    <select id="findByActivityIdAndStatus" resultMap="DetailResultMap">
+        SELECT 
+            ar.registration_id, ar.user_id, ar.activity_id, ar.registration_time, ar.status, ar.remark,
+            u.username, u.email, u.avatar,
+            a.title, a.description, a.start_time, a.end_time, a.location, a.type
+        FROM activity_registration ar
+        LEFT JOIN user u ON ar.user_id = u.user_id
+        LEFT JOIN activity a ON ar.activity_id = a.activity_id
+        WHERE ar.activity_id = #{activityId} AND ar.status = #{status}
+        ORDER BY ar.registration_time DESC
+    </select>
+
+    <!-- 统计某活动的报名人数 -->
+    <select id="countByActivityId" parameterType="int" resultType="int">
+        SELECT COUNT(*) FROM activity_registration WHERE activity_id = #{activityId}
+    </select>
+
+    <!-- 统计某活动指定状态的报名人数 -->
+    <select id="countByActivityIdAndStatus" resultType="int">
+        SELECT COUNT(*) FROM activity_registration 
+        WHERE activity_id = #{activityId} AND status = #{status}
+    </select>
+
+    <!-- 查询所有报名记录 -->
+    <select id="findAll" resultMap="DetailResultMap">
+        SELECT 
+            ar.registration_id, ar.user_id, ar.activity_id, ar.registration_time, ar.status, ar.remark,
+            u.username, u.email, u.avatar,
+            a.title, a.description, a.start_time, a.end_time, a.location, a.type
+        FROM activity_registration ar
+        LEFT JOIN user u ON ar.user_id = u.user_id
+        LEFT JOIN activity a ON ar.activity_id = a.activity_id
+        ORDER BY ar.registration_time DESC
+    </select>
+    
+    <!-- 根据状态查询所有报名记录 -->
+    <select id="findAllByStatus" parameterType="string" resultMap="DetailResultMap">
+        SELECT 
+            ar.registration_id, ar.user_id, ar.activity_id, ar.registration_time, ar.status, ar.remark,
+            u.username, u.email, u.avatar,
+            a.title, a.description, a.start_time, a.end_time, a.location, a.type
+        FROM activity_registration ar
+        LEFT JOIN user u ON ar.user_id = u.user_id
+        LEFT JOIN activity a ON ar.activity_id = a.activity_id
+        WHERE ar.status = #{status}
+        ORDER BY ar.registration_time DESC
+    </select>
+
+</mapper>

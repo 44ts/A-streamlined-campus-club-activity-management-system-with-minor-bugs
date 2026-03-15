@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>活动管理 - 校园活动管理系统</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div th:replace="fragments/navbar :: navbar"></div>
+
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">活动管理</h4>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <a th:href="@{/activity/add}" class="btn btn-success">
+                        <i class="fas fa-plus"></i> 添加活动
+                    </a>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>图片</th>
+                                <th>活动标题</th>
+                                <th>活动地点</th>
+                                <th>开始时间</th>
+                                <th>结束时间</th>
+                                <th>活动类型</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="activity : ${activities}">
+                                <td th:text="${activity.activityId}"></td>
+                                <td>
+                                    <img th:if="${activity.image}" 
+                                         th:src="@{|/${activity.image}|}" 
+                                         alt="活动图片" 
+                                         style="width: 80px; height: 60px; object-fit: cover; border-radius: 4px;">
+                                    <span th:unless="${activity.image}" class="text-muted">无图片</span>
+                                </td>
+                                <td th:text="${activity.title}"></td>
+                                <td th:text="${activity.location}"></td>
+                                <td th:text="${#dates.format(activity.startTime, 'yyyy-MM-dd HH:mm')}"></td>
+                                <td th:text="${#dates.format(activity.endTime, 'yyyy-MM-dd HH:mm')}"></td>
+                                <td th:text="${activity.type}"></td>
+                                <td>
+                                    <span th:if="${activity.status == 'published'}" class="badge bg-success">已发布</span>
+                                    <span th:if="${activity.status == 'draft'}" class="badge bg-warning">待审核</span>
+                                    <span th:if="${activity.status == 'rejected'}" class="badge bg-danger">已拒绝</span>
+                                </td>
+                                <td>
+                                    <a th:href="@{/activity/edit/{id}(id=${activity.activityId})}" class="btn btn-sm btn-primary me-1">
+                                        <i class="fas fa-edit"></i> 编辑
+                                    </a>
+                                    <a th:href="@{/registration/activity/{id}(id=${activity.activityId})}" class="btn btn-sm btn-info me-1">
+                                        <i class="fas fa-users"></i> 报名
+                                    </a>
+                                    <a th:href="@{/activity/delete/{id}(id=${activity.activityId})}" class="btn btn-sm btn-danger" onclick="return confirm('确定要删除吗？');">
+                                        <i class="fas fa-trash"></i> 删除
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

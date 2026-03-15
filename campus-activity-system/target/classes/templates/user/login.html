@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 - 校园活动管理系统</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/custom.css}" rel="stylesheet">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h1 class="login-title">校园活动管理系统</h1>
+                <p class="login-subtitle">探索精彩校园生活，参与丰富多彩活动</p>
+            </div>
+            
+            <form th:action="@{/user/login}" method="post">
+                <!-- 错误提示 -->
+                <div th:if="${error}" class="alert alert-danger" role="alert">
+                    <span th:text="${error}"></span>
+                </div>
+                
+                <!-- 用户名输入 -->
+                <div class="form-group">
+                    <label for="username" class="form-label">用户名 / 账号</label>
+                    <input type="text" 
+                           class="form-control" 
+                           id="username" 
+                           name="username" 
+                           placeholder="请输入用户名"
+                           required>
+                </div>
+                
+                <!-- 密码输入 -->
+                <div class="form-group">
+                    <label for="password" class="form-label">密码</label>
+                    <input type="password" 
+                           class="form-control" 
+                           id="password" 
+                           name="password" 
+                           placeholder="请输入密码"
+                           required>
+                </div>
+                
+                <!-- 用户角色选择 -->
+                <div class="role-selector">
+                    <div class="role-option">
+                        <input type="radio" 
+                               id="role-student" 
+                               name="role" 
+                               value="STUDENT" 
+                               checked>
+                        <label for="role-student" class="role-label">学生</label>
+                    </div>
+    
+                    <div class="role-option">
+                        <input type="radio" 
+                               id="role-admin" 
+                               name="role" 
+                               value="ADMIN">
+                        <label for="role-admin" class="role-label">管理员</label>
+                    </div>
+                </div>
+                
+                <!-- 登录按钮 -->
+                <button type="submit" class="btn-login">登录</button>
+                
+                <!-- 底部链接 -->
+                <div class="login-footer">
+                    <p>还没有账号？<a th:href="@{/user/register}">立即注册</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

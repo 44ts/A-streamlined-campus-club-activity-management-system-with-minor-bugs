@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>活动列表 - 校园活动管理系统</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+    <link rel="stylesheet" th:href="@{/css/fontawesome.min.css}">
+</head>
+<body>
+    <div th:replace="fragments/navbar :: navbar"></div>
+
+    <div class="container mt-4 mb-5">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">活动列表</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div th:each="activity : ${activities}" class="col-md-6 col-lg-4 mb-4">
+                        <div class="activity-card">
+                            <img th:if="${activity.image != null}"
+                                 th:src="@{|/${activity.image}|}" 
+                                 class="activity-image" 
+                                 th:alt="${activity.title}"
+                                 style="width: 100%; height: 200px; object-fit: cover;">
+                            <img th:unless="${activity.image != null}"
+                                 src="https://via.placeholder.com/400x200/4a90e2/ffffff?text=活动图片" 
+                                 class="activity-image" 
+                                 th:alt="${activity.title}"
+                                 style="width: 100%; height: 200px; object-fit: cover;">
+                            <div class="activity-body">
+                                <span class="activity-badge">
+                                    <i class="fas fa-users"></i> [[${activity.type}]]
+                                </span>
+                                <h3 class="activity-title" th:text="${activity.title}"></h3>
+                                <div class="activity-meta">
+                                    <span>
+                                        <i class="fas fa-map-marker-alt"></i> [[${activity.location}]]
+                                    </span>
+                                </div>
+                                <div class="activity-meta">
+                                    <span>
+                                        <i class="fas fa-clock"></i> [[${#dates.format(activity.startTime, 'yyyy年MM月dd日 HH:mm')}]]
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="activity-footer">
+                                <div class="activity-views">
+                                    <i class="fas fa-eye"></i>
+                                    <span>0 浏览</span>
+                                </div>
+                                <button class="btn-join" th:attr="data-activity-id=${activity.activityId}"
+                                        th:onclick="'showRegistrationModal(' + ${activity.activityId} + ')'">
+                                    <i class="fas fa-user-plus"></i>
+                                    <span>报名</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 活动报名模态框 -->
+    <div class="modal fade" id="registrationModal" tabindex="-1" aria-labelledby="registrationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="registrationModalLabel">
+                        <i class="fas fa-clipboard-list"></i> 活动报名
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <!-- 活动图片 -->
+                        <div class="col-md-5">
+                            <img id="modal-activity-image" 
+                                 src="" 
+                                 alt="活动图片" 
+                                 class="img-fluid rounded shadow-sm"
+                                 style="width: 100%; height: 250px; object-fit: cover;">
+                        </div>
+                        <!-- 活动信息 -->
+                        <div class="col-md-7">
+                            <h4 id="modal-activity-title" class="mb-3 text-primary"></h4>
+                            
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-tag text-primary me-2"></i>
+                                    <strong>活动类型：</strong>
+                                    <span id="modal-activity-type" class="ms-2 badge bg-info"></span>
+                                </div>
+                                
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-calendar-check text-success me-2"></i>
+                                    <strong>开始时间：</strong>
+                                    <span id="modal-activity-start" class="ms-2"></span>
+                                </div>
+                                
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-calendar-times text-danger me-2"></i>
+                                    <strong>结束时间：</strong>
+                                    <span id="modal-activity-end" class="ms-2"></span>
+                                </div>
+                                
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-map-marker-alt text-warning me-2"></i>
+                                    <strong>活动地点：</strong>
+                                    <span id="modal-activity-location" class="ms-2"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <strong><i class="fas fa-info-circle text-info me-2"></i>活动描述：</strong>
+                                <p id="modal-activity-description" class="mt-2 text-muted" style="max-height: 100px; overflow-y: auto;"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i> 取消
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="confirmRegistration()">
+                        <i class="fas fa-check"></i> 确认报名
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-light py-4 mt-5">
+        <div class="container text-center">
+            <p class="text-muted mb-0">© 2026 校园活动管理系统 | 让校园生活更精彩</p>
+        </div>
+    </footer>
+
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+    <script>
+        // 活动数据
+        let activitiesData = [];
+        let currentActivityId = null;
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 从HTML中提取活动数据
+            const activityElements = document.querySelectorAll('.activity-card');
+            activityElements.forEach(element => {
+                const activityId = parseInt(element.querySelector('.btn-join').dataset.activityId);
+                const titleEl = element.querySelector('.activity-title');
+                const typeEl = element.querySelector('.activity-badge');
+                const metaSpans = element.querySelectorAll('.activity-meta span');
+                const title = titleEl ? titleEl.textContent : '';
+                const type = typeEl ? typeEl.textContent.trim() : '';
+                const location = metaSpans[0] ? metaSpans[0].textContent.trim() : '';
+                const timeStr = metaSpans[1] ? metaSpans[1].textContent.trim() : '';
+                const imageElement = element.querySelector('.activity-image');
+                const image = imageElement ? imageElement.src : '';
+                
+                // 提取描述（这里需要根据实际HTML结构调整）
+                const description = '活动描述';
+                
+                activitiesData.push({
+                    activityId: activityId,
+                    title: title,
+                    type: type,
+                    location: location,
+                    startTime: timeStr ? new Date(timeStr.replace(/[年月]/g, '-').replace(/日/g, '')) : new Date(),
+                    endTime: timeStr ? new Date(timeStr.replace(/[年月]/g, '-').replace(/日/g, '')) : new Date(),
+                    description: description,
+                    image: image
+                });
+            });
+        });
+        
+        // 显示报名模态框
+        function showRegistrationModal(activityId) {
+            currentActivityId = activityId;
+            
+            // 查找活动数据
+            const activity = activitiesData.find(a => a.activityId === activityId);
+            
+            if (!activity) {
+                alert('活动信息加载失败');
+                return;
+            }
+            
+            // 检查是否为管理员（这里需要从服务器获取用户角色）
+            const userRole = 'user'; // 临时值，实际应该从服务器获取
+            if (userRole === 'admin') {
+                alert('管理员不可报名活动');
+                return;
+            }
+            
+            // 填充模态框数据
+            document.getElementById('modal-activity-title').textContent = activity.title;
+            document.getElementById('modal-activity-type').textContent = activity.type;
+            document.getElementById('modal-activity-description').textContent = activity.description;
+            document.getElementById('modal-activity-location').textContent = activity.location;
+            
+            // 格式化时间
+            const startTime = activity.startTime;
+            const endTime = activity.endTime;
+            document.getElementById('modal-activity-start').textContent = formatDateTime(startTime);
+            document.getElementById('modal-activity-end').textContent = formatDateTime(endTime);
+            
+            // 设置图片（拼接 context-path + 相对路径）
+            const contextPath = /*[[@{/}]]*/ '/campus-activity/';
+            const imageUrl = activity.image ? contextPath + activity.image : 'https://via.placeholder.com/400x250/4a90e2/ffffff?text=活动图片';
+            document.getElementById('modal-activity-image').src = imageUrl;
+            
+            // 显示模态框
+            const modal = new bootstrap.Modal(document.getElementById('registrationModal'));
+            modal.show();
+        }
+        
+        // 确认报名
+        function confirmRegistration() {
+            if (!currentActivityId) {
+                alert('活动信息错误');
+                return;
+            }
+            
+            // 使用相对路径
+            fetch('/campus-activity/registration/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'activityId=' + currentActivityId
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('网络响应错误: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    // 关闭模态框
+                    bootstrap.Modal.getInstance(document.getElementById('registrationModal')).hide();
+                    // 刷新页面
+                    location.reload();
+                } else {
+                    if (data.needLogin) {
+                        if (confirm(data.message + '，是否前往登录？')) {
+                            window.location.href = '/campus-activity/user/login';
+                        }
+                    } else {
+                        alert(data.message);
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('报名失败，请稍后重试');
+            });
+        }
+        
+        // 格式化日期时间
+        function formatDateTime(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            return year + '年' + month + '月' + day + '日 ' + hours + ':' + minutes;
+        }
+    </script>
+</body>
+</html>

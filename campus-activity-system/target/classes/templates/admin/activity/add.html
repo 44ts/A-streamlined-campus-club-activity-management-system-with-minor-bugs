@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>添加活动 - 校园活动管理系统</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div th:replace="fragments/navbar :: navbar"></div>
+
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">添加活动</h4>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/activity/save}" method="post" th:object="${activity}" enctype="multipart/form-data">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="title">活动标题</label>
+                            <input type="text" class="form-control" id="title" th:field="*{title}" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="type">活动类型</label>
+                            <input type="text" class="form-control" id="type" th:field="*{type}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description">活动描述</label>
+                        <textarea class="form-control" id="description" th:field="*{description}" rows="4" required></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="location">活动地点</label>
+                            <input type="text" class="form-control" id="location" th:field="*{location}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="startTime">开始时间</label>
+                            <input type="datetime-local" class="form-control" id="startTime" th:field="*{startTime}" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="endTime">结束时间</label>
+                            <input type="datetime-local" class="form-control" id="endTime" th:field="*{endTime}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="status">状态</label>
+                        <select class="form-control" id="status" th:field="*{status}" required>
+                            <option value="draft">草稿</option>
+                            <option value="published">已发布</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="imageFile">活动图片</label>
+                        <input type="file" class="form-control-file" id="imageFile" name="imageFile" accept="image/*" onchange="previewImage(this)">
+                        <small class="form-text text-muted">支持JPG、PNG、GIF格式，建议尺寸800x600像素</small>
+                        <div id="imagePreview" class="mt-2" style="display:none;">
+                            <img id="preview" src="" alt="图片预览" style="max-width: 300px; max-height: 300px; border: 1px solid #ddd; padding: 5px;">
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">保存</button>
+                    <a th:href="@{/activity/manage}" class="btn btn-secondary ml-2">取消</a>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+    <script>
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('preview').src = e.target.result;
+                    document.getElementById('imagePreview').style.display = 'block';
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+</body>
+</html>

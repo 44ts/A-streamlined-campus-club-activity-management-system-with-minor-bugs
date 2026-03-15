@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>活动报名管理 - 校园活动管理系统</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+    <link rel="stylesheet" th:href="@{/css/fontawesome.min.css}">
+    <style>
+        .registration-table {
+            margin-top: 20px;
+        }
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .status-pending {
+            background-color: #ffc107;
+            color: #000;
+        }
+        .status-approved {
+            background-color: #28a745;
+            color: #fff;
+        }
+        .status-rejected {
+            background-color: #dc3545;
+            color: #fff;
+        }
+        .filter-buttons .btn {
+            margin-right: 5px;
+        }
+        .filter-buttons .btn.active {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="fragments/navbar :: navbar"></div>
+
+    <div class="container mt-4 mb-5">
+        <div class="card">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h4 class="mb-0"><i class="fas fa-users"></i> 活动报名管理</h4>
+                <a th:href="@{/activity/manage}" class="btn btn-light btn-sm">
+                    <i class="fas fa-arrow-left"></i> 返回活动管理
+                </a>
+            </div>
+            <div class="card-body">
+                <div th:if="${message}" class="alert alert-success alert-dismissible fade show">
+                    <span th:text="${message}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+                    <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <div class="mb-3">
+                    <h5>筛选状态：</h5>
+                    <div class="filter-buttons btn-group" role="group">
+                        <a th:href="@{/registration/manage}" 
+                           th:class="${status == null ? 'btn btn-primary' : 'btn btn-outline-primary'}">
+                            全部
+                        </a>
+                        <a th:href="@{/registration/manage(status='pending')}" 
+                           th:class="${status == 'pending' ? 'btn btn-warning' : 'btn btn-outline-warning'}">
+                            待审核
+                        </a>
+                        <a th:href="@{/registration/manage(status='approved')}" 
+                           th:class="${status == 'approved' ? 'btn btn-success' : 'btn btn-outline-success'}">
+                            已通过
+                        </a>
+                        <a th:href="@{/registration/manage(status='rejected')}" 
+                           th:class="${status == 'rejected' ? 'btn btn-danger' : 'btn btn-outline-danger'}">
+                            已拒绝
+                        </a>
+                    </div>
+                </div>
+
+                <div th:if="${#lists.isEmpty(registrations)}" class="text-center py-5">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">暂无报名记录</p>
+                </div>
+
+                <table th:if="${!#lists.isEmpty(registrations)}" class="table table-hover registration-table">
+                    <thead>
+                        <tr>
+                            <th>用户头像</th>
+                            <th>用户名</th>
+                            <th>联系方式</th>
+                            <th>报名时间</th>
+                            <th>状态</th>
+                            <th>备注</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="reg : ${registrations}">
+                            <td>
+                                <img th:if="${reg.user.avatar != null}" 
+                                     th:src="@{${reg.user.avatar.startsWith('/') ? reg.user.avatar : '/' + reg.user.avatar}}" 
+                                     alt="头像"
+                                     style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                                <i th:if="${reg.user.avatar == null}" 
+                                   class="fas fa-user-circle fa-2x text-muted"></i>
+                            </td>
+                            <td th:text="${reg.user.username}"></td>
+                            <td>
+                                <div><i class="fas fa-envelope"></i> <span th:text="${reg.user.email}"></span></div>
+                            </td>
+                            <td th:text="${#dates.format(reg.registrationTime, 'yyyy-MM-dd HH:mm')}"></td>
+                            <td>
+                                <span th:if="${reg.status == 'pending'}" class="status-badge status-pending">
+                                    <i class="fas fa-clock"></i> 待审核
+                                </span>
+                                <span th:if="${reg.status == 'approved'}" class="status-badge status-approved">
+                                    <i class="fas fa-check-circle"></i> 已通过
+                                </span>
+                                <span th:if="${reg.status == 'rejected'}" class="status-badge status-rejected">
+                                    <i class="fas fa-times-circle"></i> 已拒绝
+                                </span>
+                            </td>
+                            <td th:text="${reg.remark ?: '-'}"></td>
+                            <td>
+                                <div th:if="${reg.status == 'pending'}" class="btn-group btn-group-sm">
+                                    <a th:href="@{/registration/approve/{id}(id=${reg.registrationId},from='manage')}"
+                                       class="btn btn-success"
+                                       onclick="return confirm('确定通过该报名吗？')">
+                                        <i class="fas fa-check"></i> 通过
+                                    </a>
+                                    <a th:href="@{/registration/reject/{id}(id=${reg.registrationId},from='manage')}"
+                                       class="btn btn-danger"
+                                       onclick="return confirm('确定拒绝该报名吗？')">
+                                        <i class="fas fa-times"></i> 拒绝
+                                    </a>
+                                </div>
+                                <span th:if="${reg.status != 'pending'}" class="text-muted">-</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-light py-4 mt-5">
+        <div class="container text-center">
+            <p class="text-muted mb-0">© 2026 校园活动管理系统 | 让校园生活更精彩</p>
+        </div>
+    </footer>
+
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

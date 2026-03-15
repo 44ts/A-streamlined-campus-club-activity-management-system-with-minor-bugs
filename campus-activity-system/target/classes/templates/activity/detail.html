@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>活动详情 - 校园活动管理系统</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+    <link rel="stylesheet" th:href="@{/css/fontawesome.min.css}">
+</head>
+<body>
+    <div th:replace="fragments/navbar :: navbar"></div>
+
+    <div class="container mt-4 mb-5">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0" th:text="${activity.title}"></h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <img th:src="@{https://via.placeholder.com/600x400/4a90e2/ffffff}" 
+                             class="img-fluid rounded" 
+                             th:alt="${activity.title}">
+                    </div>
+                    <div class="col-md-6">
+                        <div class="activity-info">
+                            <div class="info-item">
+                                <i class="fas fa-tag text-primary mr-2"></i>
+                                <span class="font-weight-bold">活动类型:</span>
+                                <span th:text="${activity.type}"></span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-map-marker-alt text-primary mr-2"></i>
+                                <span class="font-weight-bold">活动地点:</span>
+                                <span th:text="${activity.location}"></span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-clock text-primary mr-2"></i>
+                                <span class="font-weight-bold">开始时间:</span>
+                                <span th:text="${#dates.format(activity.startTime, 'yyyy年MM月dd日 HH:mm')}"></span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-clock text-primary mr-2"></i>
+                                <span class="font-weight-bold">结束时间:</span>
+                                <span th:text="${#dates.format(activity.endTime, 'yyyy年MM月dd日 HH:mm')}"></span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-calendar-alt text-primary mr-2"></i>
+                                <span class="font-weight-bold">创建时间:</span>
+                                <span th:text="${#dates.format(activity.createTime, 'yyyy年MM月dd日 HH:mm')}"></span>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <button class="btn btn-primary btn-lg">
+                                <i class="fas fa-user-plus"></i> 立即报名
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-5">
+                    <h5 class="text-primary">活动描述</h5>
+                    <div class="activity-description" th:text="${activity.description}"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-light py-4 mt-5">
+        <div class="container text-center">
+            <p class="text-muted mb-0">© 2026 校园活动管理系统 | 让校园生活更精彩</p>
+        </div>
+    </footer>
+
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

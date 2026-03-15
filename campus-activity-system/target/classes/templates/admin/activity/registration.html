@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>活动报名管理 - 校园活动管理系统</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-pending {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        .status-approved {
+            background-color: #28a745;
+            color: white;
+        }
+        .status-rejected {
+            background-color: #dc3545;
+            color: white;
+        }
+        .filter-tabs .btn {
+            margin-right: 5px;
+        }
+        .filter-tabs .btn.active {
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="fragments/navbar :: navbar"></div>
+
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">活动报名管理</h4>
+                <a th:href="@{/activity/manage}" class="btn btn-light btn-sm">
+                    <i class="fas fa-arrow-left"></i> 返回活动管理
+                </a>
+            </div>
+            <div class="card-body">
+                <!-- 筛选状态 -->
+                <div class="filter-tabs mb-4">
+                    <span class="mr-2">筛选状态：</span>
+                    <a th:href="@{/activity/registration?status=all}" class="btn btn-primary" th:classappend="${status == 'all' ? 'active' : ''}">
+                        全部
+                    </a>
+                    <a th:href="@{/activity/registration?status=pending}" class="btn btn-warning" th:classappend="${status == 'pending' ? 'active' : ''}">
+                        待审核
+                    </a>
+                    <a th:href="@{/activity/registration?status=approved}" class="btn btn-success" th:classappend="${status == 'approved' ? 'active' : ''}">
+                        已通过
+                    </a>
+                    <a th:href="@{/activity/registration?status=rejected}" class="btn btn-danger" th:classappend="${status == 'rejected' ? 'active' : ''}">
+                        已拒绝
+                    </a>
+                </div>
+                
+                <!-- 报名列表 -->
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>用户头像</th>
+                                <th>用户姓名</th>
+                                <th>联系方式</th>
+                                <th>报名时间</th>
+                                <th>状态</th>
+                                <th>备注</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="registration : ${registrations}">
+                                <td>
+                                    <img th:if="${registration.user.avatar}" 
+                                         th:src="@{${registration.user.avatar}}" 
+                                         class="rounded-circle" 
+                                         style="width: 40px; height: 40px; object-fit: cover;">
+                                    <img th:unless="${registration.user.avatar}" 
+                                         src="https://via.placeholder.com/40" 
+                                         class="rounded-circle" 
+                                         style="width: 40px; height: 40px;">
+                                </td>
+                                <td th:text="${registration.user.username}"></td>
+                                <td>
+                                    <div>
+                                        <i class="fas fa-envelope"></i> 
+                                        <span th:text="${registration.user.email}"></span>
+                                    </div>
+                                </td>
+                                <td th:text="${#dates.format(registration.registrationTime, 'yyyy-MM-dd HH:mm')}"></td>
+                                <td>
+                                    <span th:if="${registration.status == 'pending'}" class="status-badge status-pending">待审核</span>
+                                    <span th:if="${registration.status == 'approved'}" class="status-badge status-approved">已通过</span>
+                                    <span th:if="${registration.status == 'rejected'}" class="status-badge status-rejected">已拒绝</span>
+                                </td>
+                                <td th:text="${registration.remark ?: '-'}"></td>
+                                <td>
+                                    <div th:if="${registration.status == 'pending'}">
+                                        <a th:href="@{/activity/registration/approve/{id}(id=${registration.registrationId})}" 
+                                           class="btn btn-success btn-sm mr-2">
+                                            <i class="fas fa-check"></i> 通过
+                                        </a>
+                                        <a th:href="@{/activity/registration/reject/{id}(id=${registration.registrationId})}" 
+                                           class="btn btn-danger btn-sm">
+                                            <i class="fas fa-times"></i> 拒绝
+                                        </a>
+                                    </div>
+                                    <span th:unless="${registration.status == 'pending'}" class="text-muted">-</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>
