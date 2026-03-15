@@ -1,7 +1,7 @@
 # 校园活动管理系统 (Campus Activity Management System)
 
 ## 项目介绍 (Project Introduction)
-
+<img width="1906" height="1074" alt="Image" src="https://github.com/user-attachments/assets/2c6efff3-b9f4-4457-9db8-375530ab09c1" />
 校园活动管理系统是一个专为高校设计的活动管理平台，旨在方便学生和管理员进行活动的发布、报名、管理等操作。系统支持活动发布、活动报名、活动管理、用户管理、公告管理等功能，为校园活动的组织和参与提供了便捷的数字化解决方案。
 
 The Campus Activity Management System is a platform designed for universities to facilitate the publishing, registration, and management of activities. The system supports activity publishing, activity registration, activity management, user management, announcement management, and other functions, providing a convenient digital solution for the organization and participation of campus activities.
